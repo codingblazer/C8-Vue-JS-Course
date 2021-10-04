@@ -1,0 +1,95 @@
+Javascript => https://javascript.info/intro
+
+Same Origin Policy => Different tabs/windows generally do not know about each other. But if host is same, they might with certain conditions.
+
+use strict => Any changes that JS made to old codes are by default not included when you are working on latest versions. If you want completely new JS implemnentations i.e. new implementations of the old functions to be picked, use strict mode
+
+let message; let user = 'John', age = 25, message = 'Hello';
+
+const COLOR_RED = "#F00";
+const COLOR_GREEN = "#0F0";
+
+let message = "hello";
+message = 123456;   => “dynamically typed” language, data types exist but not bound to variables
+
+
+--------------------------------------------------
+INFINITY, -INFINITY, NaN represents a computational error. It is a result of an incorrect or an undefined mathematical operation, for instance: alert( "not a number" / 2 );
+
+number
+BigInt, 
+String => "Hello" and 'Hello' are same but `Abc ${this is extended string format}`, No CHAR data type in JS
+Boolean
+Null => unknown, nothing or no pointer 
+Undefined => Value not assigned => if variable is declared but not assigned the value or assigned a undefined as value. 
+object
+symbol => unique identifier for the object 
+
+---------------------------------------
+
+Remainder %,
+Exponentiation ** => a**b = power(a,b)
+
+// Converts non-numbers
+alert( +true ); // 1
+alert( +"" );   // 0
+
+let c = 3 - (a = b + 1); => = returns a value as well 
+a = b = c = 2 + 2;
+n += 5;
+
+String comparison using > is possible 
+Boolean vs number comparison is possible => if(true == 1)
+
+=== checks equality with comparison of types also => because normally with ==, javascript can compare non same types also by coverting them automatically to numbers  
+null == undefined 
+
+IMP LESSON 
+Treat any comparison with undefined/null where == is used with exceptional care.
+Don’t use comparisons >= > < <= or == with a variable which may be null/undefined, unless you’re really sure of what you’re doing. If a variable can have these values, check for them separately.
+-------------------------------------
+if (1) is possible
+Conditional operator ‘?’
+-----------------------------------
+The result of a ?? b is: => will go to b only when a is undefined or null.
+
+if a is defined, then a,
+if a isn’t defined, then b.
+
+or a || b => will go to b if a evaluates to any false value i.e. "", false, 0 => in all these cases also, it will go to b even though value to a is defined but value is this
+
+?? short way to choose the first “defined” value from a list while || is way to choose first truth value from the list
+--------------------------------------
+Type conversion  => can result in Nan if not possible 
+
+String(value)
+Number(str)
+Boolean(str or number)
+-----------------------------------
+for (let i = 0; i < 3; i++) {}
+break;
+continue;
+
+switch (a) {
+  case 3:
+    alert( 'Too small' );
+    break;
+default:
+    alert( "I don't know such values" );
+    }
+-------------------------------------
+ends with semiclon 
+Functions => copy by value => pass by value happens for the parameters 
+Default values => text = "no text given" 
+
+A function with an empty return or without it returns undefined
+
+One function – one action
+
+Functions are values, they can be assigned, passed etc 
+
+ask("Do you agree?", showOk, showCancel); => showOk and showCancel are callbacks 
+
+A Function Expression is created when the execution reaches it and is usable only from that moment. Function definition, a normal function can be called before it is defined. 
+-------------------------------------
+

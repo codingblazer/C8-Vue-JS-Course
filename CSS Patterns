@@ -1,0 +1,172 @@
+CSS Patterns 
+
+
+1. If you want to override the skylab util CSS class like text-md or margin-bottom-xl =>
+
+On parent of element define a class parent
+
+.parent {
+	.margin-bottom-xl {
+		margin-bottom: 60px ! important 
+	}
+}
+
+Using the important and defining it inside a scope p is important
+
+2. Category Naming a hierarchy =>
+
+taxability => common stuff here
+taxability-exempt => specific to exempt
+taxability-collapsed => specific to collapsed
+
+3. .options span {
+  background-color: var(--color-blue-lightest);
+}
+
+Inside options class, for all span elements, this should be applied
+
+4. Learning => you were applying the class which changes color of icon on the s-icon tag itself and class being s-icon {color: …} => not applying because there is no s-icon inside your class because you applied on s-icon itself => you should just do your class {color: …} and it will work 
+
+5. .search-view {
+  s-col[span~="2"] {
+    flex-basis: 21%;
+    max-width: 21%;
+  }
+}
+
+Observe how to write css for skylab component when it is used with specific attr like span = 2 here
+Obsrve that if you want to override CSS property of the skylab component itslef => do s-col {//things to override}
+
+6. In extension of above, if there is some property not directly applied to s-col but used by skylan inside of s-col like font-size etc => use s-col {font-size: !important} => it wont work without the important i guess => verify this 
+
+7. 
+s-col.back-button {
+  .pad-top-xs {
+    padding-top: 0.18rem !important;
+  }
+}
+=> back button class used inside the s-col element
+
+8.
+.hr-text {
+  h2 {
+    color: var(--color-gray-medium);
+    width: 100%;
+    font-weight: 600;
+    text-align: center;
+    border-bottom: 0.15rem solid var(--color-gray-light);
+    line-height: 0.1em !important;
+  }
+
+  h2 span {
+    background: var(--color-white);
+    line-height: 0.1em;
+  }
+}
+
+      <s-col span="3" class="back-button pad-bottom-none">
+        <router-link to="/">
+          <s-icon class="align-self-center" name="arrow-left"></s-icon
+          ><span>Back to home</span>
+        </router-link>
+      </s-col>
+
+9. Stepper design 
+    <s-row>
+      <s-col span="8" center>
+        <ul class="steps">
+          <li
+            class="active"
+            v-for="s in steps.slice(0, currentStep)"
+            v-bind:key="s"
+          >
+            {{ s }}
+          </li>
+          <li class="active">{{ steps[currentStep] }}</li>
+          <li v-for="s in steps.slice(currentStep + 1)" v-bind:key="s">
+            {{ s }}
+          </li>
+        </ul>
+      </s-col>
+    </s-row>
+
+
+.steps li {
+  list-style-type: none;
+  float: left;
+  width: 25%;
+  position: relative;
+  text-align: center;
+}
+
+.steps li::before {
+  content: " ";
+  line-height: 30px;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  border: 1px solid #ddd;
+  display: block;
+  text-align: center;
+  margin: 0 auto 10px;
+  background-color: white;
+}
+
+.steps li:after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background-color: #ddd;
+  top: 15px;
+  left: -50%;
+  z-index: -1;
+}
+
+.steps li:first-child:after {
+  content: none;
+}
+
+.steps li.active {
+  color: dodgerblue;
+}
+
+.steps li.active:before {
+  border-color: dodgerblue;
+  background-color: dodgerblue;
+}
+
+.steps .active:after {
+  background-color: dodgerblue;
+}
+
+before means within the li element, subchild element called ::before will be added => when you will click this before in inspect window, it will show css for this beefore element.
+after means within the li element, subchild element called ::after will be added => when you will click this after in inspect window, it will show css for this after element.
+
+steps li css => this is defintion for text elements of stepper => because of the float left, each li is horizontal list => list style none makes no bullet or anything => each li takes 25% of the width available and total width is controlled by the col which is parent having span => text align center makes the text li come in ceenter of width available to each li
+
+
+step li before css => this is the definition for the circle that we see for the stepper => inisde li there is before eleement now and content = " " space means it will show up i.e. basically this content is what making it act like an element 
+=> Now line height is height of this circle or before elemnt, border radious width height border background clor => all designs the circle 
+=> Now display block is making the li element as block in whole and thus instead of things arranged like before | li | after => they will be arranged like:
+before | after
+li 
+=> this is because ::before says display block which in turn means "once i have completed, do <br> kind of thing" => li falls in next line => and after li, next element i.e. after will take left position => 
+Question => see how you can design 
+before
+li | after
+
+
+steps li after css => this is deefinition for the line that we see in stepper => inside li there is element after and it has content "" => and height of this element is 4px which is height of line => width is same as li element as 100% and now, left -50% is basically moving the line to left so that the line starts from the circle and ends to the preevious circle => since it will overlap with circle => z index of this is -1 to hide beneath the circle 
+
+.steps li:first-child:after => for the first li child, if we have a line i.e. after thign => it will try to end at previous circle which wont be there and thus we dont want this line and thus content is none which will make line also go away i.e. after element for this li wont be applied
+
+.steps li.active => if active class is applied on li => then color of text will be blue 
+.steps li.active:before  => if active class on li => color of circle is blue 
+.steps .active:after {
+  background-color: dodgerblue;
+}
+=> color of line before active li is also blue 
+
+
+

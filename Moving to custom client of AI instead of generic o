@@ -1,0 +1,83 @@
+Moving to custom client of AI instead of generic one
+
+Reason: The generic client did not support TSA or TSU users login because that is special privilege which lets TSA user to impersonate any customer account and make changes there => We cant allow that in generic client of AI which is used by many applications who registered for this generic client. We want to give it to only few authorised ones and thus for these cases rather than providing scope within that generic client => the application needs to create custom different client for their application. 
+
+
+We created the client and configured it using the https://scm.platform.us-west-2.avalara.io/web-platform/avalara-ui/-/blob/develop/packages/src/aui-identity/README.md#configure-a-custom-client-authorizationserver-or-identity-provider and changes can be seen in config.js
+
+Now once configured, this custom client has different credentials which we need to replace in place of generic client secret. Now for generic client the secrets were not needed locally to make auth. But for custom client you need the secrets locally. => Some changes are needed locally 
+
+Also, in hercule-server-build => the docker image is created which don’t need secrets and this image only is deployed to kubernetes. 
+Next step in unit test and function test i.e. build.sh and ft.sh => In both these cases, to perform tests, auth will be needed and hence the secrets for custom client will be needed and thus some changes needs to be done here
+Next step is deployment => where the image that was created above is deployed in real running container on kubernetes and thus for this running thing to do auth, again it will need these secrets =:> some changes here as well might be needed 
+
+
+Local changes TBD =>
+
+Currently if you look in master at commit => 8e06e0a8 =>
+
+1. There is a file called secret.temp.js which is providing secrets by exporting secrets.json which in turn Is picked by the in-memory secret provider of the AUI => Now we will rename this to secret.js because for custom client it says to create secret.js in root and export secrets.json which this file is doing already from secrets/secrets.json.
+
+2. secret.json at secrets/secrets.json => We will add in Readme for the developers to download the awsfqa i.e. qa environement secrets from the S3 location to their local machine in a file called secrets.json inside secrets folder so that secret.js can export them to be available locally for aui which is requirement now since we are using custom client.
+
+3. We will add secrets folder inside gitignore so that nobody pushes the secrets.json file by mistake to git since these have to be kept in secret. Pushing secret.js file should be fine in git. 
+
+GOCD Build and Test and FT required changes =>
+
+Dockerfile.server => COPY secrets-temp.js ./secrets.js at line 32 => Now we will be copying secrets.js instead of secrets-temp.js => This is basically copying secret.js file from local gocd server (gocd must have downloaded the repo in gocd from gitlab) to the inside of docker image. 
+
+Now when does this docker image runs ? First, we can't put secrets.json inside docker image because anyone might download docker image from dockerhub and access the secrets => whenever this image runs for whatever reasons like tests, ft, or deployment run => we have to provide the secrets from outside in a safe way. 
+-------------------------------
+docker-compose.test.yaml => It is at this time when this image runs via build.sh for running the unit tests => We bring up the hercule server image using compose command inside build.sh. Now what we can do is =>
+
+Inside build.sh => Just before compose command is to be run => Download the secrets.json from s3 using s4cmd and thus they will be downloaded locally inside gocd. i.e. 
+
+Before this line in build.sh => VERSION=${VERSION} ARTIFACTORY_USER=${ARTIFACTORY_USER} ARTIFACTORY_API_KEY=${ARTIFACTORY_API_KEY} docker-compose -f docker-compose.test.yaml build test
+and after server image was built 
+
+=> Now when the compose command will run, we have to somehow send these secrets from gocd local to docker image => Inside docker compose file of test i.e.. docker-compose.test.yaml we will add a volume for hercule server image section => since we cant put secrrets inside the running image, we will attach a volume and keep secrrets inside that. Volume is accessible to hercule server running container as we declrared it inside compose and volume cant be downloaded by anyone =>
+
+
+volume
+./secrets.json:/app/secrets => this volume tells to paste the secrets.json from local gocs to volumes app folder having secrets folder => And as specified inside image's secret.js, it will pick these secrets from secrets folder we just created above. 
+
+---------------------------------
+docker-compose.ft.yaml
+
+=> same changes herre and in ft.sh to make it work for ft tests as well which also brings up this image 
+
+------------------------------------
+Actual deployment case => when this image runs in production in kubertnetes => 
+
+See area -51 charts/hercule-server => prehook.sh runs before the deployment and it downloads the secret.json from s3 location in the local gocd server at ./secrets/secrets.json location based on the environment. 
+
+See secreets.yaml file inside area-51 => In this, actually kubernetes has concept of creating secrets inside it which can used by running containers like hercule server => similar to docker compose has volumes to refer secrets => In this file we are creating secret inside kubernetes named aui-secret by copying it from gocd location where we downloaded secrets above in prehook script => {{ (.Files.Glob "secrets/*").AsSecrets | indent 2 }}
+
+See deployment.yaml => 
+      volumes:
+        - name: secrets
+          secret:
+            secretName: aui-secret
+
+Volume is created called secrets which has secret key attached to it called aui-secret. This volume is mounted along with the container heere => 
+          volumeMounts:
+            - name: secrets
+              mountPath: "/app/secrets"
+              readOnly: true
+
+  name: secrets => this volume is mounted at location app/secrets/secret.json which will be now read by the secret.js file for the running container to use. 
+
+------------------------------------
+Action item => Testing in CI env first using this. Add the secrets of custom client in s3 for qa but dont remove the old ones as qa env still dependent on that and ci will need the new one => it can be tested in CI because deploy also happenning in CI env. Once CI is tested, we wont push to qa directly but first get the secret of custom client for sbx and prod by raising the ticket and then in one go push everywhere. 
+once this is done, everything old is working fine with new client and we can add UI changes like switch accounts etc. 
+
+----------------------------------
+Hercule admin 
+See the file secret-dummy-admin.json 
+
+Actually, admin server brings 2 containers => init and admin server => admin first does all the migrations and then only server is brough up => though admin never uses secrets because there is no auth there => But since package.json is common, when init happens, it needs aui config and something there looks for secret and init fails => we created a dummy secret file for admin to refer to 
+
+It's possible when you create custom client configuration, admin server based on aui config it is obtaining, it might look for key 'hercule-midgard-apps' client which is our custom client and thus we need to add it to this file again with dummy secrets because it is not gonna use them for real. If custom client key is different in sbx and prod when they give us, might need to add them also to this file to make it work in those env also. 
+
+
+

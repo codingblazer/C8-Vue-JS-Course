@@ -1,0 +1,507 @@
+1. Vue JS Crash Course Notes:  https://www.youtube.com/watch?v=4deVCNJq3qc&feature=youtu.be
+Good for practice or testing:  https://jsfiddle.net/
+https://github.com/gwenf/vue-quiz
+https://github.com/gwenf/vue-adopt-pets
+
+https://blog.logrocket.com/how-to-write-a-vue-js-app-completely-in-typescript/ => Should cover all about the VUE in TYPESCRIPT 
+
+https://javascript.info/ => For javascript revision
+
+Resources:
+🔗 TheJaredWilcurt Twitch Channel: https://www.twitch.tv/thejaredwilcurt 
+🔗 Sarah Drasner, Vue Animations: https://www.youtube.com/watch?v=LLnVL...
+🔗 Views on Vue podcast: https://devchat.tv/views-on-vue/ 
+🔗 State of Vue.js Report: https://www.monterail.com/state-of-vu...
+
+Library, More Robust than Jquery as it provides specific recommended code patterns for code organization, uses good ideas from different frameworks like React, Angular and JQuery. Is usually combined with other libraries together to sort of give framework like React Angular but a custom one.
+
+Think of Vue as a library which has some functions. Now, there is function to create Vue instance which takes object as parameter and this object is provided the HTML element from the HTML file you want to make as root. Now you start adding things and providing data to this root using the other library functions only. This way, since you are using library functions, you follow specific code patterns and organizations. Also, the these add functions etc from library then creates a DOM form of HTML which is replaced back in place of HTML file element with the id root and shown to you the full HTML file generated after this.
+We use el key for this 
+
+The object can also take object with key "data" and value which can have KV passed as variables to the HTML DOM. Thus inside HTML el root, you can use {{anyVariablePassed}} to access this. {{}} is used to write any JS code inside HTML el and comes from Vue only since Vue has access to the element el root. 
+
+This object can also take object with key "methods" which will have all the method names as keys and their definitions as value. Please note that from inside of any function definition you can acces the data variable using this. 
+
+
+This object can also take the filters or pipe function which can be used to map.
+<p> {{cat.name | capitalize }} </p>
+=> capitalize is the filter function which is passed in the Vue object
+
+
+This object can also take computed => methods that basically operates on data only and do computation => you can pull out all computations that you might  be doing inside {{}} as computed function and simply call that function. Also used Vuex. It can be called like {{kittify}}
+
+This object can also take the watch object which can have functions or objects which will be triggered if the props/data members are changed => the name of the watch function should be after that data value => 
+Also, if you loook at the second watch => this is other way, where we can pass the watch as object on data member => immediate will apply the handler the first time also and also when the changes occur to the data member 
+=> 
+
+app =  new Vue({
+
+
+	el: '#root',
+
+
+	data: {
+	cats: ['abc','cde'],
+	newCat: ''
+	},
+
+
+	methods: {
+		addKitty: function() {
+		return this.cats.push(this.newCat)
+		}
+	},
+
+
+	filters: {
+	capitalize: function(value) {
+		return value.toUpperCase()
+	}
+	},
+
+
+	computed: {
+		kittify: function() {
+		return this.newCat + 'y'
+		}
+	},
+
+	watch: {
+	cats: function(newCats, oldCats) {
+		///write implementation 
+	}
+
+	watch: {
+	cats: {
+	immediate: true,
+	handler() {
+	//implementation
+	}
+	}
+	}
+
+	}
+
+
+})
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Directives => used to interact with the DOM. An element can have multiple directives being used inside the tag.
+
+1. V-model directive 
+Data Binding => 2 way data binding => v-model Directive 
+ 
+<input v-model = "anyVariablePassed"> => Input will have value of anyVariablePassed initially and when input value is changed from UI, so will variable anyVariablePassed value change because both are bound together.
+
+
+2. v-if, v-else-if, v-else => takes expressiion that results to boolean result 
+<div v-if="countDataVariable === 0">
+<input v-model="name">
+</div>
+<div v-else-if="countDataVariable === 1">
+<input v-model="name">
+</div>
+<div v-else="countDataVariable === 2">
+<input v-model="name">
+</div>
+
+3. v-show => same as v-if, but here even if content inside is not displayed, it will be present in the DOM unlike v-if with the display:none css.
+
+4. v-bind:attribute="parse whatever is inside a javascript" => let say v-bind:attribute="if abc.length > 2" which will convert to attribute="true" like <button disabled="true">
+
+	SHORTHAND: v-bind:attribute => :attribute
+
+	Very common use case => Add classes dynamically => 
+	:class="{red: email.length > 2}" => red is  css class => This is object syntax where you pass a object inside mentioning which all classes to apply as key and when to apply as value.
+
+	:class="[email.length>2 ? 'red' : 'green']" => red and green are css classes => This is a array syntax where you can toggle between classes using javascript as shown
+
+5. v-html="" => Whatever JS value is given inside is parsed as a HTML 
+
+6. <p v-once>{{email}}</p> => this email variable if changed, won't be binded and changed here. It is used once as a static value.
+
+7. v-for 
+
+<ul>
+<li v-for="cat in cats">{{cat}}</li>
+</ul>
+=> cats is passed a array data 
+
+Can be done even when cats is array of object or anything else 
+
+Also you have to give the key when using the v-for as :key="index" or any unique object member so that each element generated by the v-for can be identified uniquely.
+
+8. v-on => for events 
+
+<button v-on:click="addKitty"> => onKitty is method passed from vue object 
+<input v-on:keyup="addKitty"> => keyup is any key pressed event pressed in text field 
+<input v-on:keyup.enter ="addKitty"> => keyup.enter is enter key pressed event pressed in text field 
+
+SHORTHAND: v-on:keyup => @keyup
+
+--------------------------------------------------------------------------
+COMPONENTS
+
+Vue has components like React => We can define them as follows and have to pass them using the Vue object like below. 
+
+
+We pass the name of the component and component object containing props, template, etc.
+
+Vue.component('cat-list', {
+
+	props: ['cats'],  // attribute key/prop name is 'cats'
+
+	template:
+		<ul>
+		<li v-for="cat in cats">cat</li> 
+		 // Since cats props is available inside the props, we can use it inside the template 
+		</ul>
+})
+
+
+app =  new Vue({
+	el: '#root',
+
+
+	data: {
+	cats: ['abc','cde'],
+	newCat: ''
+	},
+
+	component: ['cat-list']
+})
+
+To use them in HTML, you can use them as custom tag =>
+
+<cat-list :cats="cats"/> => cats is attribute/prop name => Since we need to pass the cats array to component class via prop, we have passed cats array which already in this HTML scope because of data object. Since "cats" can be taken as string, we did :cats to treat "cats" as javascript and thus will be taken as array. 
+
+--------------------------------------------------------------------
+Vue Lifecycle Methods: Many other lifecycle methods are present in the documentation
+
+app =  new Vue({
+	el: '#root',
+
+
+	data: {
+	cats: ['abc','cde'],
+	newCat: ''
+	},
+
+	created: function() {
+	console.log("Created")
+	},
+
+	mounted: function() {
+	console.log("mounted") => mounted to DOM 
+	},
+
+	updated: function() {
+	console.log("updated") => state is changed
+	},
+
+	destroyed: function() {
+	console.log("Destroyed")
+	}
+})
+
+
+setTimeput(function() {
+	app.destroy();
+},5000) => destroys the component 
+
+--------------------------------------------------------------------
+
+VUE CLI 
+
+vue --version 
+vue create quiz => Choose default option or you select any template => if choose to go for manual => You can include sass css preprocessor, include vue x, routers being setup by 
+choosing the multiple options using the space 
+
+
+
+
+
+
+--------------------------------------------------------------------
+Visual Studio Commands
+
+Use Shift + Command + P => to perform actions 
+Use code . from the terminal to open the project in visual studio code 
+
+-------------------------------------------------------------------
+Project structure 
+
+package.json => scripts can be used by the npm run <script> => Inside package.json, different scripts you are using are actually CLI scripts.
+
+
+public => index.html => HTML to be displayed 
+
+App.vue => Main single page HTML content that has to be displayed
+
+Any .vue file has template, script and css => script basically exports the data part for template to use and bind with. CSS part provides the styles.
+
+components => you create multiple components/.vue files and they are used inside the App.vue to construct single page application.
+
+Main.js => All it does is create Vue object by passing it App.vue => since it is passed to Vue object, it converts it to HTML form => Inside Main.js., we are then plugging this generated HTML in the public index.html to get the full HTML file which is served.
+
+
+ROUTER AND OTHER FILES 
+
+views => views are the combinations of components like Home page etc => They are not reusable while components are.
+router.js => router file => various paths and routes and their corresponding views that needs to be shown.
+store.js => store for state management file => Any variable/object/state that you want across the components are stored here => global variables 
+
+router and store from above are passed to the Vue instance that we create in the main.js.
+
+
+---------------------------------------------------------------
+
+Bootstrap Vue => helps not worry about styling as provides the components directly with the styling done. 
+
+npm install bootstrap-vue
+ 
+You can add bootstrap vue to the main.js file and to the App.vue 
+
+To use it, we can copy the code for any component of bootstrap wrapped inside div and paste it in our component template => like done for jumbotron in question box 
+
+Grids System =>
+
+Bootstrap uses 12 columns => Now the question box was taking a full page horizontally => we put the question box inside the grid => create a container which will have this question box => Now container has its own padding on both left and right => Inside container is a question box for which we gave 6 colums and offset of 3 columns => 3 columns will be empty, 6 by question box, and remaining 3 will be empty on right 
+---------------------------------------------------------------------------------------------------
+Opentb API for the question which we are preloading in the mount lifecycle method of the App.vue 
+----------------------------------------------------------------------------------------------------- 
+Now, we can use the fetch function to get the response for the open tb api => fetch is inbuilt function for GET => no library or anything is needed 
+------------------------------------------------------------------------------------------------------
+VUE DEV TOOLS 
+
+https://github.com/vuejs/vue-devtools => Add this extension => It shows all the App.Vue final components => If you go to any component, you can see its data on the right side. You can edit that data there also.  
+Vue dev tool might require refresh inside it, for data to update when you do any action.
+This also has Vuex store tab which shows any errors that might occur. 
+------------------------------------------------------------------------------------------------------------
+Passing Props => 
+
+1. Pass it to the child component as an :attribute="js value".
+2. In the child component, the like data object, we can have props object which will mention this as expecting this prop to be received like below along with the type: 
+{
+	props: {
+	currentQuestion: Object
+	}
+}
+3. Now you can use this currentQuestion prop which is received like a data of component directly in the HTML. 
+4. To access prop or data variable from within the JS => you have to use the this keyword. 
+----------------------------------------------------------------------------------------------------------------------
+IMP POINT => Data might take some time to fetch and thus if you are accessing this data anywhere, you should put v-if for accessing the data only if its defined i.e. it has arrived 
+Similary very important to figure out all the edge cases in UI like this => what if index has crossed the number of questions => For any data find all the possibilities like you do in DS algo problems. Similary, check you are not able to submit multiple answers, button should be disabled => for any component like button => when should it be enabled, when only you should be able to click it etc 
+
+return arr.push() wont work and you have first push and store the result in variable and then return that varaible 
+Do create a lot of commits and also, like in quiz app, what component is responsible for what => this should be done properly 
+Also clarify the gocd thing with Prasanna 
+
+You can move the class decider logics also in the methods if they are getting long 
+
+@ inside the import statement means refering to the src directory.
+----------------------------------------------------------------------------------------------------------------------
+STYLES 
+
+Can be declared within the Vue component => If you make them scoped -> they wont be global and only applied to the local component => 
+See the class from HTML that is getting applied => and do => 
+.list-group {
+	margin-bottom: 15px;
+}
+--------------------------------------------------------------------------------------------------------------------
+lodash lib has lot of helper functions => _ is used for lodash generally as import variable 
+------------------------------------------------------------------------------------------------------------------------------------------
+
+Routers 
+
+You add the routes in the route.js and corresponding View for each route that needs to be shown. Also, the <route-link> is used to tell that if this link is clicked in the UI, the path of the browser should change to particular path and when this does, so will the router.js come into play and change the component accordingly.
+
+Dynamic route matching => Query param based routes =>
+/user/:id => inside the component that you have mentioned for the route, you can access the param as => route.param.id
+
+---------------------------------------------------------------------------------------------------------
+STORE 
+
+Create a folder store and create files => state.js, actions.js, mutations.js and move the store.js file as index.js inside this folder. Import the state.js, actions.js, mutations.js files into this index.js.
+
+Inside main.js, if you remember we are importing the store and passing it to Vue object. => Now store import will look in store folder since it wont find the file => Now, the inside the folder, since import does not mention any file, by default anywhere it is index.js file and it will pick that one. => And this index.js is passed as store to Vue object. Also, in normal store.js file which was generated, you will find that we were sending state, action, mutations which are normal objects to Vuex.Store instance and exporting this Store instance. In index.js, we are importing these 3 objects state, mutations, actions from 3 files and passing them again to Vues.store and exporting it. Both are same.
+
+Using the Store 
+import {mapState} from 'vuex' => will bring all the states with store that was sent to Vue object.
+computed: {
+	...mapState(['cats']) 
+}
+=> cats is the defined in the state.js inside the object as:
+export default {
+	cats: []
+}
+
+=> Thus, since these are defined inside the computed, they can be accessed as data members inside the component.
+
+
+CRUD Operations => Actions and Mutations 
+
+Inside actions.js, we exported the method, addPet which is doing crud operation. We will pass the payload (which will have new pet) and the {commit} object which is coming from the vuex. We are passing the commit object from vuex since vuex is available where the call to this is happening => the passing happens automatically, since addPet action will be coming from mapActions, vuex will itself attach context object with that call. Actually it is context.commit but we can use commit directly. Now inside, we will use commit to commit the mutation corresponding to this for the payload. Thus commit function will always call for the given mutation and pass the payload to that mutation. 
+
+Inside mutations.js, we will always get the state object from state.js (How is vuex knowing this? Because we used its function commit) => Inside the mutation function we called i.e. appendPet, we will get state object and payload object => For implementation, we will mutate the state to add this new payload containing pet. 
+
+Using ACTIONS
+import {mapActions} from 'vuex' => will bring all the actions with store that was sent to Vue object.
+
+methods: {
+	...mapActions([
+		'addPet' => the name of action => we can now use this directly as method data member.
+	])
+}
+
+GETTTERS: Getters are just to get the state values and modifying them, not in the state but just getting and modifying for our purpose (updating state is asynch, getting it is not) => These are also created in a separate file inside the store => getters.js => 
+export default {
+	getAnimalsLength: (state) => {
+		state.animals.length
+	}
+}
+
+In index.js, where we are constructing the Store object, pass the getters as 4th argument too. (after importing the getters from the getter.js file). The getter method, since registered with Vuex whenever called like below, will be passed the state object by the Vues automatically as shown above => 	getAnimalsLength: (state) => . => Also any getter also get 2nd parameter passed by vuex, which is all the getters, you might chose to take and use it or not => getAnimalsLength: (state, getters) => this way you can call other getters fromt the getter.
+
+import {mapGetters} from 'vuex'
+computed: {
+	...mapGetters(['getAnimalsLength'])
+}
+
+Very common use case for getters are the filters on top of the state objects =. think of it as wrapper get functions. 
+---------------------------------------------------------------------------------------------------------------------
+Vue js using Typescript 
+
+In manual options while creating a project using the CLI, also add the typescript support. 
+import Component from 'vue-class-component' => In vue typescript support page, => https://vuejs.org/v2/guide/typescript.html
+Above library is used for class type vue components with typescript
+
+The class will extend the Vue Component and you don't need to mention anything as data: {} or methods: {} => Anything inside the class as member is data and any method inside the class is understood method only. 
+
+
+export default {
+  props: {
+    currentQuestion: Object,
+    next: Function,
+    increment: Function
+  },
+  data: function() {
+    return {
+      selectedIndex: null,
+      correctIndex: null,
+      shuffledAnswers: [],
+      answered: false
+    }
+  }
+  }
+
+  will change to => ----------------------------
+
+  import Vue from 'vue'
+import Component from 'vue-class-component'
+
+@Component
+export default class HelloWorld extends Vue {
+  // Declared as component data
+  message = 'Hello World!'
+  //for props see the documentation of class=components @https://class-component.vuejs.org/guide/props-definition.html
+}
+
+
+
+
+Vue property decorator => library => very common and popular => Decorators for prop, watch etc => helps to do type checking for props, etc also. 
+
+
+In VS code => extension called vetur => support for vue js tools etc and support for typescript also. 
+
+
+https://blog.logrocket.com/how-to-write-a-vue-js-app-completely-in-typescript/ => Should cover all about the VUE in TYPESCRIPT 
+
+Create the quiz/cat project in typescript for practice 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-----------------------------------------------------------------------------------
+
+Questions 
+
+Why do we need the template from bootstrap inside the parent template => why will bootstrap need that template 
+
+Libraries uses slots => Any component offered by libraries will have a template like vue component and there, they have at multiple places created <slot> </slot> tags => whatever slot you give as attribute is chosen where your code will be inserted 
+
+Why do we return the data function in Vue instead of data object => 
+https://winnercrespo.com/why-does-the-data-property-on-a-vue-component-must-be-a-function/#:~:text=So%2C%20the%20reason%20why%20Vue,be%20reflected%20in%20all%20instances.
+Why is extra promise chain required for its completion => Think of it as a onComplete of future in scala
+
+Javascript syntax like push and let a = [...some array to be copied] => something similar was their for the objects, arrow functions, when to use this, 
+Check Vue dev tool data 
+See how to do formatting 
+Check react carol to understand how css works with overrriding lib styles and think hard on what conclusions you made earlier => 
+Why is export default needed in the first place 
+
+
+Where is context and commit object coming from and how are we using it since no import => we are passing it 
+Also, why do we need mutations and actions both ? => Actions and asynch => mutations are called when asynch part completes and you get the state and payload 
+
+form => @submit.prevent => 
+
+Why are getters inside the computed and why are others inside computed or specific data concept => check for all 
+
+-----------
+In typescript class-component, why are we extending Vue while we used to not do that in JS 
+import { Options, Vue } from 'vue-class-component'; => is Vue coming from vue-class-components or from vue lib ?
+
+
+
+---------------------------------------------------------
+App vue should contain permanent stuff like header or routerview for switching betweent he components => it might contain preloaded data or data that has to be shared across the different views
+
+Views => One pages or view to be shown => should make use of the components + make changes to store or get from store directly. Can maintain internal data etc => mounted and preloading of data should also happen here =>
+
+Component => only props should be used to display their data => Mostly no internal data is maintained here
+
+    <s-select :inputid="name" multiple="true">
+        <option value="None"> None </option>
+        <option v-for="(element, index) in data"
+         v-bind:key="index"
+         :value="element">
+            {{element}}</option>
+    </s-select>
+
+
+   
+-----------------------------------------------------------
+Read about Provide and Inject in Vue js here: https://medium.com/@znck/provide-inject-in-vue-2-2-b6473a7f7816
+The corresponding usage for typescript for this concept can be found in vue property decorator lib here: https://www.npmjs.com/package/vue-property-decorator
+-------------------------------------------------
+Explains the vue prototype and vuex => https://stackoverflow.com/questions/48050762/vuejs2-update-vue-prototype-global-object
+
+Vue.prototype.$_ = _;
+and then you can use it globally like => this.$_
+
+
+
+0----------------------------
+IMP CONCEPT => https://stackoverflow.com/questions/57699473/vuejs-hook-mounted-is-not-called-when-page-is-re-open-by-vue-router => mount is not called everytime you the route is changed 
+
+https://michaelnthiessen.com/force-re-render/ => So, if you want to force the component to re-render => use the key and change the key => Use case => we were using the skylab component and somehow it was not setting back the selected options to nil when data was set to [] => to clear the internal state we wanted to force re-render the component because usually, even if the data changes, or even route, the component mostly dont re-renders 
+
+
+ 
