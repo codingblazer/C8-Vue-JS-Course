@@ -1,6 +1,7 @@
 # C8-Vue-JS-Course
 Vue.js crash course - https://www.youtube.com/watch?v=4deVCNJq3qc&amp;feature=youtu.be
 
+My solution: https://scm.platform.us-west-2.avalara.io/midgard/citius-bootcamp/-/tree/sachin-wip
 
 Bootstrap a Vue based project with TypeScript support. Reference - https://cli.vuejs.org/
 
